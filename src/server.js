@@ -3,9 +3,12 @@ import dotenv from "dotenv";
 import { initDB } from "./config/db.js";
 import ratelimit from "./middleware/rateLimiter.js";
 import transactionRoute from "./routes/transactionRoute.js";
+import job from "./config/cron.js";
+
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+
+if(process.env.NODE_ENV === "production")job.start()
 
 // Middleware to parse JSON request bodies
 app.use(ratelimit);
@@ -20,9 +23,11 @@ app.use(express.json());
 // connectDB(process.env.DATABASE_URL);
 
 
+const PORT = process.env.PORT || 5001;
 
-app.get("/health ", (req, res) => {
-  res.send("Hello from backend!!! this is server!  it's working");
+
+app.get("api/health ", (req, res) => {
+  res.status(200).json({ status: "OK" });
 });
 
 app.use("/api/transactions", transactionRoute);
